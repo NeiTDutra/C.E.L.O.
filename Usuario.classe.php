@@ -141,7 +141,6 @@
 
 				} catch (PDOException $e) {
 
-				    echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
@@ -215,7 +214,6 @@
 
 			} catch (PDOException $e){
 
-				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 				echo $e->getMessage();
 
 			}
