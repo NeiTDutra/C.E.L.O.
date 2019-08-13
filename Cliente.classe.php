@@ -2,6 +2,12 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
 
+	if (!isset($_SESSION['n_orc'])){
+	
+		require_once 'menu_cliente.php';
+		
+	}
+	
 	include_once('classes.php');
 
 	class Cliente{
@@ -88,6 +94,7 @@
 
 				} catch (PDOException $e){
 
+					echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
@@ -104,11 +111,19 @@
 
 		}
 
-		public function lista_cli(){
+		public function lista_cli($p){
+		
+			if ($p != 'nada'){
+				
+				$sql = 'SELECT * FROM tbcliente WHERE nome_cli LIKE "'.$p.'%" ORDER BY nome_cli ASC';
+				
+			}else{
+			
+				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
+				
+			}
 
 			try{
-
-				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
 
 		        $res = Conexao::getInstance()->prepare($sql);
 				$res->execute();
@@ -161,6 +176,7 @@
 
 			} catch (PDOException $e){
 
+				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 				echo $e->getMessage();
 
 			}

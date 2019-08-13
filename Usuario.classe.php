@@ -3,11 +3,11 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
         
-        require_once ('menu_usuario.php');
+    require_once ('menu_usuario.php');
 
 	include_once('classes.php');
 
-	class Usuario {
+	class Usuario{
 	  
 		private $id_usu;
 		private $nome_usu;
@@ -66,11 +66,11 @@
 			$u1->setSenha_usu($_POST['senha']);
 
 
-			if ($u1->getNome_usu() == '' || $u1->getSenha_usu() == ''){
+			/*if ($u1->getNome_usu() == '' || $u1->getSenha_usu() == ''){
 
 	  			echo '<p style="color:red;">Falta usuário ou senha!!!</p>';
 
-			}else{
+			}else{*/
 
 				$nome_usu = $u1->getNome_usu();
 				$senha_usu = $u1->getSenha_usu();
@@ -83,11 +83,12 @@
 					$v_sql->execute();
 					$lis = $v_sql->fetchAll(PDO::FETCH_ASSOC);
                                         
-                                        foreach ($lis as $l){
+                    foreach ($lis as $l){
                                             
-                                            $nivel = $l['nivel_usu'];
+                    	$cod_usu = $l['cod_usu'];
+                        $nivel = $l['nivel_usu'];
                                             
-                                        }
+                    }
 
 					if ($lis == null){
 
@@ -96,8 +97,11 @@
 					}else{
 
 						session_start();
+						
+						$_SESSION['cod_usu'] = $cod_usu;
 						$_SESSION['$nome'] = $u1->getNome_usu();
-                                                $_SESSION['$nivel'] = $nivel;
+                        $_SESSION['$nivel'] = $nivel;
+                        
 						header ('location:index.php?op=1');
 
 					}
@@ -110,7 +114,7 @@
 
 				}
 
-			}
+			//}
 
 			unset($u1);
 			unset($v_sql);
@@ -141,9 +145,15 @@
 
 				} catch (PDOException $e) {
 
+				    echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
+				
+				//require_once 'classes.php';
+				//$mail = new Mail;
+				//$mail->enviar();
+				//unset($mail);
 			
 				unset($lan_usu);
 				unset($p_sql);
@@ -214,6 +224,7 @@
 
 			} catch (PDOException $e){
 
+				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 				echo $e->getMessage();
 
 			}
