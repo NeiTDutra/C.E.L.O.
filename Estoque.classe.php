@@ -113,11 +113,9 @@
 					$p_sql->bindValue(':valor_prod', $lan_prod->getVal_prod());
 
 					$p_sql->execute();
-					$this->lista_prod();
+					$this->lista_prod('nada');
 
 				} catch (PDOException $e){
-
-					echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
@@ -154,14 +152,23 @@
 
 		}
 
-		public function lista_prod(){
+		public function lista_prod($p){
+
+			if ($p != 'nada'){
+			
+				$sql = 'SELECT * FROM tbproduto WHERE desc_prod LIKE "'.$p.'%" ORDER BY desc_prod ASC';
+			
+			}else{
+				
+				$sql = 'SELECT * FROM tbproduto';
+			
+			}
 
 			try{
 				
-				$sql = 'SELECT * FROM tbproduto';
-				
 
-		        $res = Conexao::getInstance()->query($sql);
+		        $res = Conexao::getInstance()->prepare($sql);
+		        $res->execute();
 		        $lis = $res->fetchAll(PDO::FETCH_ASSOC);
 		
 				echo '<div class="menu_tab">
@@ -219,8 +226,7 @@
 			 		</div>';
 	  
 			} catch (PDOException $e){
-
-				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
+			
 				echo $e->getMessage();
 
 			}
@@ -271,7 +277,7 @@
 					$p_sql->bindValue(':valor_prod', $al_prod->getVal_prod());
 					$p_sql->bindValue(':id_prod', $al_prod->getId_prod());
 					$p_sql->execute();
-					$this->lista_prod();
+					$this->lista_prod('nada');
 				
 				}catch(PDOException $e){
 				

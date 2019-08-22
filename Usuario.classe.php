@@ -3,11 +3,11 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
         
-        require_once ('menu_usuario.php');
+    isset($_SESSION['$nome']) ? require_once ('menu_usuario.php') : null;
 
 	include_once('classes.php');
 
-	class Usuario {
+	class Usuario{
 	  
 		private $id_usu;
 		private $nome_usu;
@@ -59,45 +59,39 @@
 
     class DAOusuario{
 
-		public function logado(){
+		public function logado($n , $s){
 
 			$u1 = new Usuario;
-			$u1->setNome_usu($_POST['nome']);
-			$u1->setSenha_usu($_POST['senha']);
-
-
-			if ($u1->getNome_usu() == '' || $u1->getSenha_usu() == ''){
-
-	  			echo '<p style="color:red;">Falta usuário ou senha!!!</p>';
-
-			}else{
+			$u1->setNome_usu($n);
+			$u1->setSenha_usu($s);
 
 				$nome_usu = $u1->getNome_usu();
 				$senha_usu = $u1->getSenha_usu();
 
 				try{
 
-					$sql = 'SELECT * FROM tbusuario WHERE nome_usu = "'.$nome_usu.'" AND senha_usu = "'.$senha_usu.'"';
+					$sql = 'SELECT * FROM tbusuario WHERE nome_usu ="'.$nome_usu.'" AND senha_usu = "'.$senha_usu.'"';
 
 					$v_sql = Conexao::getInstance()->prepare($sql);
 					$v_sql->execute();
-					$lis = $v_sql->fetchAll(PDO::FETCH_ASSOC);
-                                        
-                                        foreach ($lis as $l){
-                                            
-                                            $nivel = $l['nivel_usu'];
-                                            
-                                        }
+					$lis = $v_sql->fetch();
 
 					if ($lis == null){
 
-						echo '<p style="color:red;">Usuário não existe!!!</p>';
+						echo '<script>alert("Usuário não existe!!!")</script>';
+						return;
 
 					}else{
 
+                    	$cod_usu = $lis['cod_usu'];
+                        $nivel = $lis['nivel_usu'];
+                        
 						session_start();
+						
+						$_SESSION['cod_usu'] = $cod_usu;
 						$_SESSION['$nome'] = $u1->getNome_usu();
-                                                $_SESSION['$nivel'] = $nivel;
+                        $_SESSION['$nivel'] = $nivel;
+                        
 						header ('location:index.php?op=1');
 
 					}
@@ -110,7 +104,7 @@
 
 				}
 
-			}
+			//}
 
 			unset($u1);
 			unset($v_sql);
@@ -145,6 +139,11 @@
 					echo $e->getMessage();
 
 				}
+				
+				//require_once 'classes.php';
+				//$mail = new Mail;
+				//$mail->enviar();
+				//unset($mail);
 			
 				unset($lan_usu);
 				unset($p_sql);

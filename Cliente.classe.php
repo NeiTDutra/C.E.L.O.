@@ -2,6 +2,12 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
 
+	if (!isset($_SESSION['n_orc'])){
+	
+		require_once 'menu_cliente.php';
+		
+	}
+	
 	include_once('classes.php');
 
 	class Cliente{
@@ -84,7 +90,7 @@
 					$p1_sql->bindValue(':email_cli', $lan_cli->getEmail_cli());
 
 					$p1_sql->execute();
-					$this->lista_cli();
+					$this->lista_cli('nada');
 
 				} catch (PDOException $e){
 
@@ -105,11 +111,19 @@
 
 		}
 
-		public function lista_cli(){
+		public function lista_cli($p){
+		
+			if ($p != 'nada'){
+				
+				$sql = 'SELECT * FROM tbcliente WHERE nome_cli LIKE "'.$p.'%" ORDER BY nome_cli ASC';
+				
+			}else{
+			
+				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
+				
+			}
 
 			try{
-
-				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
 
 		        $res = Conexao::getInstance()->prepare($sql);
 				$res->execute();
@@ -192,7 +206,7 @@
 				$p_sql->bindValue(':email_cli', $a_cli->getEmail_cli());
 				$p_sql->bindValue(':cod_cli', $a_cli->getId_cli());
 				$p_sql->execute();
-				$this->lista_cli();
+				$this->lista_cli('nada');
 			
 			}catch(PDOException $e){
 			
