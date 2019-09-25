@@ -2,6 +2,12 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
 
+	if (!isset($_SESSION['n_orc']) && !isset($_POST['info'])){
+	
+		require_once 'menu_cliente.php';
+		
+	}
+	
 	include_once('classes.php');
 
 	class Cliente{
@@ -84,7 +90,7 @@
 					$p1_sql->bindValue(':email_cli', $lan_cli->getEmail_cli());
 
 					$p1_sql->execute();
-					$this->lista_cli();
+					$this->lista_cli('nada');
 
 				} catch (PDOException $e){
 
@@ -104,12 +110,43 @@
 			}
 
 		}
+		
+		public function infoCli(){
+		
+			$usuario = $_SESSION['cod_usu'];
+			$sql = 'SELECT * FROM tbcliente';
+			
+			try {
+			
+				$p_sql = Conexao::getInstance()->prepare($sql);
+				$p_sql->execute();
+				$no_cli = $p_sql->rowCount();
+				
+				$_SESSION['$info_cli'] = $no_cli;
+			
+			} catch (PDOException $e){
+			
+				echo $e->getMessage();
+			
+			}
+			
+			unset ($p_sql);
+		
+		}
 
-		public function lista_cli(){
+		public function lista_cli($p){
+		
+			if ($p != 'nada'){
+				
+				$sql = 'SELECT * FROM tbcliente WHERE nome_cli LIKE "'.$p.'%" ORDER BY nome_cli ASC';
+				
+			}else{
+			
+				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
+				
+			}
 
 			try{
-
-				$sql = 'SELECT * FROM tbcliente ORDER BY cod_cli';
 
 		        $res = Conexao::getInstance()->prepare($sql);
 				$res->execute();
@@ -122,7 +159,8 @@
 					<th class="idt">Cod.</th>
 					<th>Nome</th>
 					<th>Fone</th>
-					<th>Email</th>';
+					<th>Email</th>
+					<th>Ações</th>';
 							
 	  
 		        foreach ($lis as $l){
@@ -150,7 +188,7 @@
 					echo $lis_cli->getEmail_cli();
 					echo '<input type="hidden" name="e_cli" value="';
 					echo $lis_cli->getEmail_cli();
-					echo '"/></td><td><input type="submit" name="sobe_altera_cli" value="!!"/></form></td></tr>';
+					echo '"/></td><td class="tdinput"><input type="submit" name="sobe_altera_cli" value="Alterar" class="altera"/><input type="submit" name="exclui_cli" value="Excluir" class="exclui"/></form></td></tr>';
 
 				}
 
@@ -192,7 +230,7 @@
 				$p_sql->bindValue(':email_cli', $a_cli->getEmail_cli());
 				$p_sql->bindValue(':cod_cli', $a_cli->getId_cli());
 				$p_sql->execute();
-				$this->lista_cli();
+				$this->lista_cli('nada');
 			
 			}catch(PDOException $e){
 			
@@ -203,5 +241,31 @@
 			unset ($a_cli);
 			unset ($p_sql);
 		}
+                
+                public function exclui_cli(){
+                    
+                    $ex_cli = new Cliente();
+                    $ex_cli->setId_cli($_POST['id_cli']);
+                    
+                    try {
+                    
+                        $sql = 'DELETE FROM tbcliente WHERE cod_cli = :id_cli';
+                        
+                        $p_sql = Conexao::getInstance()->prepare($sql);
+                        $p_sql->bindValue(':id_cli', $ex_cli->getId_cli());
+                        $p_sql->execute();
+                        
+                        $this->lista_cli('nada');
+                        
+                    } catch (Exception $ex) {
+                        
+                        echo $ex->getMessage();
+                        
+                    }
+                    
+                    unset($p_sql);
+                    unset($ex_cli);
+                    
+                }
 
     }

@@ -3,11 +3,11 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
         
-        require_once ('menu_usuario.php');
+    if (isset($_SESSION['$nome']) && !isset($_POST['info'])){ require_once ('menu_usuario.php'); }
 
 	include_once('classes.php');
 
-	class Usuario {
+	abstract class Usuario{
 	  
 		private $id_usu;
 		private $nome_usu;
@@ -57,47 +57,40 @@
 	  
 	}
 
-    class DAOusuario{
+    class DAOusuario extends Usuario{
 
-		public function logado(){
+		public function logado($n , $s){
 
-			$u1 = new Usuario;
-			$u1->setNome_usu($_POST['nome']);
-			$u1->setSenha_usu($_POST['senha']);
+			$this->setNome_usu($n);
+			$this->setSenha_usu($s);
 
-
-			if ($u1->getNome_usu() == '' || $u1->getSenha_usu() == ''){
-
-	  			echo '<p style="color:red;">Falta usuário ou senha!!!</p>';
-
-			}else{
-
-				$nome_usu = $u1->getNome_usu();
-				$senha_usu = $u1->getSenha_usu();
+				$nome_usu = $this->getNome_usu();
+				$senha_usu = $this->getSenha_usu();
 
 				try{
 
-					$sql = 'SELECT * FROM tbusuario WHERE nome_usu = "'.$nome_usu.'" AND senha_usu = "'.$senha_usu.'"';
+					$sql = 'SELECT * FROM tbusuario WHERE nome_usu ="'.$nome_usu.'" AND senha_usu = "'.$senha_usu.'"';
 
 					$v_sql = Conexao::getInstance()->prepare($sql);
 					$v_sql->execute();
-					$lis = $v_sql->fetchAll(PDO::FETCH_ASSOC);
-                                        
-                                        foreach ($lis as $l){
-                                            
-                                            $nivel = $l['nivel_usu'];
-                                            
-                                        }
+					$lis = $v_sql->fetch();
 
 					if ($lis == null){
 
-						echo '<p style="color:red;">Usuário não existe!!!</p>';
+						echo '<script>alert("Usuário não existe!!!")</script>';
+						return;
 
 					}else{
 
+                    	$cod_usu = $lis['cod_usu'];
+                        $nivel = $lis['nivel_usu'];
+                        
 						session_start();
-						$_SESSION['$nome'] = $u1->getNome_usu();
-                                                $_SESSION['$nivel'] = $nivel;
+						
+						$_SESSION['cod_usu'] = $cod_usu;
+						$_SESSION['$nome'] = $this->getNome_usu();
+                        $_SESSION['$nivel'] = $nivel;
+                        
 						header ('location:index.php?op=1');
 
 					}
@@ -110,20 +103,17 @@
 
 				}
 
-			}
 
-			unset($u1);
 			unset($v_sql);
 
 		}
 
 		public function lanca_usu(){
 
-			$lan_usu = new Usuario;
-			$lan_usu->setId_usu($_POST['id_usu']);
-			$lan_usu->setNome_usu($_POST['nome_usu']);
-		    $lan_usu->setSenha_usu($_POST['senha_usu']);
-	 	    $lan_usu->setNivel_usu($_POST['nivel_usu']);
+			$this->setId_usu($_POST['id_usu']);
+			$this->setNome_usu($_POST['nome_usu']);
+		    $this->setSenha_usu($_POST['senha_usu']);
+	 	    $this->setNivel_usu($_POST['nivel_usu']);
 
 			if (empty($_POST['id_usu'])){
 		       
@@ -132,21 +122,31 @@
 				    $sql = 'INSERT INTO tbusuario ( nome_usu, senha_usu, nivel_usu ) VALUES ( :nome_usu, :senha_usu, :nivel_usu )';
 		  
 				    $p_sql = Conexao::getInstance()->prepare($sql);
-				    $p_sql->bindValue(':nome_usu', $lan_usu->getNome_usu());
-				    $p_sql->bindValue(':senha_usu', $lan_usu->getSenha_usu());
-				    $p_sql->bindValue(':nivel_usu', $lan_usu->getNivel_usu());
+				    $p_sql->bindValue(':nome_usu', $this->getNome_usu());
+				    $p_sql->bindValue(':senha_usu', $this->getSenha_usu());
+				    $p_sql->bindValue(':nivel_usu', $this->getNivel_usu());
 
 				    $p_sql->execute();
 					$this->lista_usu();
 
 				} catch (PDOException $e) {
 
-				    echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
+				
+				$ass = 'Novo usuário';
+				$mess = 'Recebemos uma mensagem no sistema pjCELO <br/></br>
+					<strong>Novo usuário foi lançado:</strong><br/>
+					<strong>Nome do usuário:</strong>'.$_SESSION['$nome'].'<br/><hr/>
+					<strong>Nome do novo usuário:</strong>'.$this->getNome_usu().'<br/>
+					<strong>Nível do novo usuário:</strong>'.$this->getNivel_usu().'<br/>';
+					
+					require_once 'classes.php';
 			
-				unset($lan_usu);
+					$mail = new Mail;
+					$mail->envia($ass, $mess);
+			
 				unset($p_sql);
 
 			}else{
@@ -156,6 +156,29 @@
 
 			}
 
+		}
+		
+		public function infoUsu(){
+		
+			$usuario = $_SESSION['$nome'];
+			$sql = 'SELECT * FROM tbusuario';
+			
+			try {
+			
+				$p_sql = Conexao::getInstance()->prepare($sql);
+				$p_sql->execute();
+				$no_usu = $p_sql->rowCount();
+				
+				$_SESSION['$info_usu'] = $no_usu;
+			
+			} catch (PDOException $e){
+			
+				echo $e->getMessage();
+			
+			}
+			
+			unset ($p_sql);
+		
 		}
 
 		public function lista_usu(){
@@ -175,35 +198,34 @@
 					<th>Id</th>
 					<th>Nome</th>
 					<th>Senha</th>
-					<th>Nível</th>';
-							
-	  
+					<th>Nível</th>
+					<th>Ações</th>';
+		
 		        foreach ($lis as $l){
 
-					$u2 = new Usuario;
-					$u2->setId_usu($l['cod_usu']);
-					$u2->setNome_usu($l['nome_usu']);
-					$u2->setSenha_usu($l['senha_usu']);
-					$u2->setNivel_usu($l['nivel_usu']);
+					$this->setId_usu($l['cod_usu']);
+					$this->setNome_usu($l['nome_usu']);
+					$this->setSenha_usu($l['senha_usu']);
+					$this->setNivel_usu($l['nivel_usu']);
 					
 				
 					echo '<tr><td>';
-					echo $u2->getId_usu();
+					echo $this->getId_usu();
 					echo '<form method="post" action=""><input type="hidden" name="id_usu" value="';
-					echo $u2->getId_usu();
+					echo $this->getId_usu();
 					echo '"/></td><td>';
-					echo $u2->getNome_usu();
+					echo $this->getNome_usu();
 					echo '<input type="hidden" name="n_usu" value="';
-					echo $u2->getNome_usu();
+					echo $this->getNome_usu();
 					echo '"/></td><td>';
-					echo $u2->getSenha_usu();
+					echo $this->getSenha_usu();
 					echo '<input type="hidden" name="s_usu" value="';
-					echo $u2->getSenha_usu();
+					echo $this->getSenha_usu();
 					echo '"/></td><td>';
-					echo $u2->getNivel_usu();
+					echo $this->getNivel_usu();
 					echo '<input type="hidden" name="ni_usu" value="';
-					echo $u2->getNivel_usu();
-					echo '"/></td><td><input type="submit" name="sobe_altera_usu" value="?"/></form></td></tr>';
+					echo $this->getNivel_usu();
+					echo '"/></td><td class="tdinput"><input type="submit" name="sobe_altera_usu" value="Alterar" class="altera"/><input type="submit" name="exclui_usu" value="Excluir" class="exclui"/></form></td></tr>';
 
 				}
 
@@ -211,37 +233,33 @@
 						</div>
 						</fieldset>
 						</div>';
-	  
 
 			} catch (PDOException $e){
 
-				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 				echo $e->getMessage();
 
 			}
 
-			unset ($u2);
 			unset ($res);
 
 		}
 
 		public function altera_usu(){
 
-			$a_usu = new Usuario;
-			$a_usu->setId_usu($_POST['id_usu']);
-			$a_usu->setNome_usu($_POST['nome_usu']);
-			$a_usu->setSenha_usu($_POST['senha_usu']);
-			$a_usu->setNivel_usu($_POST['nivel_usu']);
+			$this->setId_usu($_POST['id_usu']);
+			$this->setNome_usu($_POST['nome_usu']);
+			$this->setSenha_usu($_POST['senha_usu']);
+			$this->setNivel_usu($_POST['nivel_usu']);
 
 			try{
 
 				$sql = 'UPDATE tbusuario SET nome_usu = :nome_usu, senha_usu = :senha_usu, nivel_usu = :nivel_usu WHERE cod_usu = :cod_usu';
 
 				$p_sql = Conexao::getInstance()->prepare($sql);
-				$p_sql->bindValue(':nome_usu', $a_usu->getNome_usu());
-				$p_sql->bindValue(':senha_usu', $a_usu->getSenha_usu());
-				$p_sql->bindValue(':nivel_usu', $a_usu->getNivel_usu());
-				$p_sql->bindValue(':cod_usu', $a_usu->getId_usu());
+				$p_sql->bindValue(':nome_usu', $this->getNome_usu());
+				$p_sql->bindValue(':senha_usu', $this->getSenha_usu());
+				$p_sql->bindValue(':nivel_usu', $this->getNivel_usu());
+				$p_sql->bindValue(':cod_usu', $this->getId_usu());
 
 				$p_sql->execute();
 				$this->lista_usu();
@@ -252,8 +270,41 @@
 
 			}
 
-			unset ($a_usu);
 			unset ($p_sql);
+		
+		}
+		
+		public function exclui_usu(){
+		
+			if($_SESSION['$nivel'] < 100){
+			
+				echo '<script>alert("Sem privilégios para executar esta ação.");</script>';
+				$this->lista_usu();
+				return false;
+			
+			}else{
+		
+			$this->setId_usu($_POST['id_usu']);
+		
+			try{
+			
+				$sql = 'DELETE FROM tbusuario  WHERE cod_usu = :id_usu';
+				
+				$p_sql = Conexao::getInstance()->prepare($sql);
+				$p_sql->bindValue(':id_usu', $this->getId_usu());
+				
+				$p_sql->execute();
+				$this->lista_usu();
+			
+			}catch(PDOException $e){
+			
+				echo $e->getMessage();
+			
+			}
+			
+			unset($p_sql);
+			
+			}
 		
 		}
 

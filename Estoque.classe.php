@@ -113,11 +113,9 @@
 					$p_sql->bindValue(':valor_prod', $lan_prod->getVal_prod());
 
 					$p_sql->execute();
-					$this->lista_prod();
+					$this->lista_prod('nada');
 
 				} catch (PDOException $e){
-
-					echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
 					echo $e->getMessage();
 
 				}
@@ -153,15 +151,86 @@
 		   return $valor;
 
 		}
+		
+		public function infoEst(){
+		
+			$usuario = $_SESSION['cod_usu'];
+			$sql = 'SELECT * FROM tbproduto';
+			
+			try {
+			
+				$p_sql = Conexao::getInstance()->prepare($sql);
+				$p_sql->execute();
+				$no_pro = $p_sql->rowCount();
+				
+				$_SESSION['$info_pro'] = $no_pro;
+			
+			} catch (PDOException $e){
+			
+				echo $e->getMessage();
+			
+			}
+			
+			unset ($p_sql);
+			
+			$q_min = 25;
+			
+			$sql = 'SELECT * FROM tbproduto WHERE quant_prod <= "'.$q_min.'"';
+			
+			try {
+			
+				$p_sql = Conexao::getInstance()->prepare($sql);
+				$p_sql->execute();
+				$no_pro = $p_sql->rowCount();
+				/*$lis = $p_sql->fetchAll();
+				
+				foreach($lis as $l) {
+				
+					
+				
+				}*/
+				$_SESSION['sit'] = 'sit_verme';
+				$_SESSION['situa_prod'] = 'Verificar';
+				$_SESSION['$info_pro_neg'] = $no_pro;
+				
+				if($no_pro == 0){
+				
+					unset($_SESSION['sit']);
+					unset($_SESSION['situa_prod']);
+				
+				} 
+			
+			} catch (PDOException $e){
+			
+				echo $e->getMessage();
+			
+			}
+			
+			unset ($p_sql);
+		
+		}
 
-		public function lista_prod(){
+		public function lista_prod($p){
+
+			if ($p == 'crit'){
+			
+				$sql = 'SELECT * FROM tbproduto WHERE quant_prod <= 25';
+			
+			}elseif ($p != 'nada'){
+			
+				$sql = 'SELECT * FROM tbproduto WHERE desc_prod LIKE "'.$p.'%" ORDER BY desc_prod ASC';
+			
+			}else{
+				
+				$sql = 'SELECT * FROM tbproduto';
+			
+			}
 
 			try{
 				
-				$sql = 'SELECT * FROM tbproduto';
-				
 
-		        $res = Conexao::getInstance()->query($sql);
+		        $res = Conexao::getInstance()->prepare($sql);
+		        $res->execute();
 		        $lis = $res->fetchAll(PDO::FETCH_ASSOC);
 		
 				echo '<div class="menu_tab">
@@ -173,9 +242,12 @@
 					<th>Tam.</th>
 					<th>Cor</th>
 					<th>Quant.</th>
-					<th>Valor</th>';
+					<th>Valor</th>
+					<th>Ações</th>';
 	  
 		        foreach ($lis as $l){
+		        
+		        	$add_style = ' style="color:red;"';
 
 					$list_prod = new Estoque;
 					$list_prod->setId_prod($l['id_prod']);
@@ -201,15 +273,17 @@
 					echo $list_prod->getCor_prod();
 					echo '<input type="hidden" name="c_prod" value="';
 					echo $list_prod->getCor_prod();
-					echo '"></td>	<td>';
+					echo '"></td>	<td';
+					echo $list_prod->getQuan_prod() <= 25 ? $add_style : null;
+					echo '>';
 					echo $list_prod->getQuan_prod();
 					echo '<input type="hidden" name="q_prod" value="';
 					echo $list_prod->getQuan_prod();
-					echo '"></td>	<td>';
+					echo '"></td>	<td >';
 					echo $list_prod->getVal_prod();
 					echo '<input type="hidden" name="v_prod" value="';
 					echo $list_prod->getVal_prod();
-					echo '"></td> <td><input type="submit" name="sobe_altera_prod" value="!!"/></form></td></tr>';
+					echo '"></td> <td class="tdinput"><input type="submit" name="sobe_altera_prod" value="Alterar" class="altera"/><input type="submit" name="exclui_prod" value="Excluir" class="exclui"/></form></td></tr>';
 
 				}
 
@@ -219,10 +293,9 @@
 			 		</div>';
 	  
 			} catch (PDOException $e){
-
-				echo '<p>Ocorreu um erro ao tentar executar esta ação, foi gerado um LOG do mesmo, tente novamente mais tarde.</p>';
+			
 				echo $e->getMessage();
-
+				
 			}
 
 		unset($list_prod);
@@ -271,7 +344,7 @@
 					$p_sql->bindValue(':valor_prod', $al_prod->getVal_prod());
 					$p_sql->bindValue(':id_prod', $al_prod->getId_prod());
 					$p_sql->execute();
-					$this->lista_prod();
+					$this->lista_prod('nada');
 				
 				}catch(PDOException $e){
 				
@@ -280,6 +353,32 @@
 				}
 			
 			}
+                        
+                        public function exclui_prod(){
+                            
+                            $id_prod = new Estoque;
+                            $id_prod->setId_prod($_POST['id_prod']);
+                            
+                            try {
+                                
+                                $sql = 'DELETE FROM tbproduto WHERE id_prod = :id_prod';
+                                
+                                $psql = Conexao::getInstance()->prepare($sql);
+                                $psql->bindValue(':id_prod', $id_prod->getId_prod());
+                                $psql->execute();
+                                
+                                $this->lista_prod('nada');
+                                
+                            } catch (Exception $ex) {
+                             
+                                echo $ex->getMessage();
+                                
+                            }
+                            
+                            unset($psql);
+                            unset($id_prod);
+                            
+                        }
 		
 
 	}
