@@ -1,6 +1,6 @@
 <?php
 
-	$root = $_SERVER['DOCUMENT_ROOT'] . '/pjCELOv.1/App/';
+	$root = $_SERVER['DOCUMENT_ROOT'] . '/C.E.L.O./';
 
 	$controllers = $root . 'Controllers/';
 	$dao = $root . 'DAO/';
