@@ -49,8 +49,8 @@
 	
 <?php
 	
-	$DIR = $_SERVER['DOCUMENT_ROOT'].'/pjCELOv.1/';
-	include $DIR . 'App/Controllers/dirdef.php'; 
+	$DIR = $_SERVER['DOCUMENT_ROOT'].'/C.E.L.O./';
+	include $DIR . 'Controllers/dirdef.php'; 
 
     if(isset($_POST['login']) || isset($_POST['usuario_log']) && !isset($_GET[''])){
 	
