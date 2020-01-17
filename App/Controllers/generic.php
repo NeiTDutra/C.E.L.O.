@@ -669,7 +669,7 @@
 
 			}
 		  
-		    $instance = new PDO('mysql:host=localhost; dbname=pjcelo', 'root', 'Senha007');
+		    $instance = new PDO('mysql:host=localhost; dbname=pjcelo', 'root', '');
 	  
 		    return $instance;
 		}
