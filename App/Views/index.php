@@ -49,7 +49,7 @@
 	
 <?php
 	
-	$DIR = $_SERVER['DOCUMENT_ROOT'].'/pjCELOv.1.1/';
+	$DIR = $_SERVER['DOCUMENT_ROOT'].'/CELO/';
 	include $DIR . 'App/Controllers/dirdef.php'; 
 
     if(isset($_POST['login']) || isset($_POST['usuario_log']) && !isset($_GET[''])){
