@@ -9,7 +9,7 @@
 		public function lanca_cli(){
 
 			$this->setId_cli($_POST['id_cli']);
-			$this->setNome_cli($_POST['nome_cli']);
+			$this->setNome_cli(ucwords($_POST['nome_cli']));
 			$this->setFone_cli($_POST['fone_cli']);
 			$this->setEmail_cli($_POST['email_cli']);
 			
@@ -74,6 +74,7 @@
 		
 			if ($p != 'nada'){
 				
+				$p = ucwords($p);
 				$sql = 'SELECT * FROM tbcliente WHERE nome_cli LIKE "'.$p.'%" ORDER BY nome_cli ASC';
 				
 			}else{
@@ -150,7 +151,7 @@
 		public function altera_cli(){
 
 			$this->setId_cli($_POST['id_cli']);
-			$this->setNome_cli($_POST['nome_cli']);
+			$this->setNome_cli(ucwords($_POST['nome_cli']));
 			$this->setFone_cli($_POST['fone_cli']);
 			$this->setEmail_cli($_POST['email_cli']);
 			
