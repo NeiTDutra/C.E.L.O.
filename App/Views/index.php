@@ -92,7 +92,7 @@
 	
 	<div id="rdp">
 	
-		<p><a href="https://sites.google.com/view/nservicos-nei/p%C3%A1gina-inicial" target="blank">< Projeto CELO - NServiços ></a></p>
+		<p><a href="https://sites.google.com/view/nservicos" target="blank">< Projeto CELO - NServiços ></a></p>
 		
 	</div>
 	

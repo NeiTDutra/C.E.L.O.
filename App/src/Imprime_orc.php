@@ -3,7 +3,7 @@
 
 ini_set('display_errors', true); error_reporting(E_ALL);
 
-	$DIR = $_SERVER['DOCUMENT_ROOT'].'/pjCELOv.1/';
+	$DIR = $_SERVER['DOCUMENT_ROOT'].'/CELO/';
 	include $DIR . 'App/Controllers/dirdef.php'; 
 
 	require_once $GLOBALS['controllers']. 'generic.php';

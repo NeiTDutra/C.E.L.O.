@@ -17,9 +17,9 @@
 	$mail->Host = "smtp.gmail.com"; // SMTP servers
 	$mail->Port = 587; 
 	$mail->SMTPAuth = true; // Caso o servidor SMTP precise de autenticação
-	$mail->Username = "projetocelo@gmail.com"; // SMTP username
-	$mail->Password = "Senha@celo#2020"; // SMTP password
-	$mail->From = "projetocelo@gmail.com"; // From
+	$mail->Username = ""; // SMTP username
+	$mail->Password = ""; // SMTP password
+	$mail->From = ""; // From
 	$mail->FromName = "pjCELOv-1.0" ; // Nome de quem envia o email
 	$mail->AddAddress($mailDestino, $_nome); // Email e nome de quem receberá //Responder
 	$mail->WordWrap = 50; // Definir quebra de linha

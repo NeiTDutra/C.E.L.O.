@@ -2,7 +2,7 @@
 
 	ini_set('display_errors', true); error_reporting(E_ALL);
 	
-	require_once $GLOBALS['models']. 'Clientes.php';
+	require_once $GLOBALS['models'].'Clientes.php';
 
 	class DAOcliente extends Cliente{
 

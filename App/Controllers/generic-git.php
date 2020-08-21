@@ -705,7 +705,7 @@
 
 			}
 		  
-		    $instance = new PDO('mysql:host=localhost; dbname=pjcelo', 'nei', 'Senha#007');
+		    $instance = new PDO('mysql:host=localhost; dbname=pjcelo', '', '');
 	  
 		    return $instance;
 		}

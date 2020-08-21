@@ -32,6 +32,6 @@
     // pega o código fonte do novo arquivo PDF gerado
     $output = $dompdf->output();
     // define aqui o nome do arquivo a ser salvo
-    file_put_contents ($GLOBALS['src'] . 'orcamentosPDF/Ormnt'.$_orc.'.pdf', $output);
+    file_put_contents ($GLOBALS['src'].'orcamentosPDF/Ormnt'.$_orc.'.pdf', $output);
     // redireciona o usuário para o download/impressão do arquivo
     die('<script>location.href="orcamentosPDF/Ormnt'.$_orc.'.pdf", "_blank";</script>');

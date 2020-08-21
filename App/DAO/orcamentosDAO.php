@@ -1,6 +1,7 @@
 <?php
 
-	ini_set('display_errors', true); error_reporting(E_ALL);
+	ini_set('display_errors', true); 
+	error_reporting(E_ALL);
 	
 	require_once $GLOBALS['models']. 'Orcamentos.php';
 
@@ -46,14 +47,12 @@
 			if(testa_redund() == true){
 			
 				echo '<script>alert("Já existe um orçamento com este código identificador.");</script>';
-				return false;
 				
 				$this->lista_orc();
 			
 			}else if (empty($_POST['id_usu']) || empty($_POST['nome_usu']) || empty($_POST['id_cli']) || empty($_POST['nome_cli']) || empty($_POST['fone_cli'])){
 			
 				echo '<script>alert("Selecione os dados do cliente.");</script>';
-				return false;
 				
 			}else{
 
