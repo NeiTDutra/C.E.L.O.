@@ -156,6 +156,8 @@
 				$p_sql->execute();
 				$n_orc = $p_sql->fetch();
 				
+				echo '<p>'.$n_orc[0].'</p>';
+				
 				return $n_orc[0];
 			
 			}catch(PDOException $e){
